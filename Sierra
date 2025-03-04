@@ -55,6 +55,7 @@ paths:
    /register:
     post:
       summary: Register and create a new user
+      description: A new user can register for an account
       tags:
         - Authenticator
       requestBody:
