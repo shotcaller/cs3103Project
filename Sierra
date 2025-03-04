@@ -568,6 +568,9 @@ components:
             comments:
                type: integer
                example: 25
+            liked:
+               type: boolean
+               example: true
          required:
             - blogId
             - userId
