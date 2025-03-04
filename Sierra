@@ -320,8 +320,8 @@ paths:
                                             
    /blogs/{blogId}/like:
       post:
-         summary: Like a blog
-         description: Allows users to add a like to a certain blog
+         summary: Like or unlike a blog
+         description: Allows users to add a like or unlike to a certain blog
          tags:
             - Blogs
          security:
@@ -335,7 +335,7 @@ paths:
               example: 1
          responses:
             '200':
-               description: Successfully added like
+               description: Successfully added or removed a like 
                content:
                   application/json:
                      schema:
@@ -355,42 +355,7 @@ paths:
                               type: string
                               example: Blog not found
                                                 
-   /blogs/{blogId}/unlike:
-      post:
-         summary: Unlike a blog
-         description: Removes a like from a certain blog
-         tags:
-            - Blogs
-         security:
-            - BearerAuth: []
-         parameters:
-            - name: blogId
-              in: path
-              required: true
-              schema:
-                 type: integer
-              example: 1
-         responses:
-            '200':
-               description: Successfully unliked a blog
-               content:
-                  application/json:
-                     schema:
-                        type: object
-                        properties:
-                           message:
-                              type: string
-                              example: Successfully unliked
-            '400':
-               description: Blog not found
-               content:
-                  application/json:
-                     schema:
-                        type: object
-                        properties:
-                           error:
-                              type: string 
-                              example: Blog not found                 
+                    
                                                     
    /blogs/{blogId}/comment:
       post:
