@@ -88,60 +88,6 @@ paths:
    
    
    /users:
-      post:
-         summary: Add new user
-         description: Adds new user to the system with their details
-         tags:
-            - Users
-         security: []
-         requestBody:
-            required: true
-            content:
-               application/json:
-                  schema:
-                     type: object
-                     properties:
-                        username:
-                           type: string
-                           example: sierrah
-                        passwordHash:
-                           type: string
-                           example: password
-                        email:
-                           type: string
-                           format: email
-                           example: sierra.howe@unb.ca
-                     required:
-                        - username
-                        - passwordHash
-                        - email
-         responses:
-            '201':
-               description: Successfully Created
-               content:
-                  application/json:
-                     schema:
-                        type: object
-                        properties:
-                           userId:
-                              type: integer
-                              example: 1
-                           username:
-                              type: string
-                              example: sierrah
-                           email:
-                              type: string
-                              example: sierra.howe@unb.ca
-            '400':
-               description: Bad request
-               content:
-                  application/json:
-                     schema:
-                        type: object
-                        properties:
-                           error:
-                              type: string
-                              example: Invalid
       get:
          summary: Retrieve all users
          description: Get a list of all registered users
