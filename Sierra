@@ -1,0 +1,605 @@
+openapi: 3.0.0
+info:
+   description: This is an API for a Blog System
+   version: 1.0.0
+   title: API for managing blogs, users, likes, and comments
+   
+servers:
+   - url: https://cs3103.cs.unb.ca:8033/
+   
+
+security:
+   - BearerAuth: []
+   
+tags:
+   - name: Authenticator
+     description: A way to authenticate users
+   - name: Users
+     description: Managing users
+   - name: Blogs
+     description: Managing Blogs
+         
+paths:
+   /login:
+      post:
+         summary: Authenticate user and log them in
+         tags:
+            - Authenticator
+         requestBody:
+            required: true
+            content:
+               application/json:
+                  schema:
+                     $ref: '#/components/schemas/Login' 
+         responses:
+            '200':
+               description: Successfully logged in user
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           token:
+                              type: string
+            '400':
+               description: User not authorized
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           error:
+                              type: string
+                              example: User not authorized        
+   
+   
+   /users:
+      post:
+         summary: Add new user
+         description: Adds new user to the system with their details
+         tags:
+            - Users
+         security: []
+         requestBody:
+            required: true
+            content:
+               application/json:
+                  schema:
+                     type: object
+                     properties:
+                        username:
+                           type: string
+                           example: sierrah
+                        passwordHash:
+                           type: string
+                           example: password
+                        email:
+                           type: string
+                           format: email
+                           example: sierra.howe@unb.ca
+                     required:
+                        - username
+                        - passwordHash
+                        - email
+         responses:
+            '201':
+               description: Successfully Created
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           userId:
+                              type: integer
+                              example: 1
+                           username:
+                              type: string
+                              example: sierrah
+                           email:
+                              type: string
+                              example: sierra.howe@unb.ca
+            '400':
+               description: Bad request
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           error:
+                              type: string
+                              example: Invalid
+      get:
+         summary: Retrieve all users
+         description: Get a list of all registered users
+         tags:
+            - Users
+         security: []
+         responses:
+            '200':
+               description: Successfully retrieved all users
+               content:
+                  application/json:
+                     schema:
+                        type: array
+                        items:
+                           $ref: '#/components/schemas/User'
+
+   /users/{userId}:
+      get:
+         summary: Retrieve details about user
+         description: Gets details about a certain user
+         tags:
+            - Users
+         security:
+            - BearerAuth: []
+         parameters:
+            - name: userId
+              in: path
+              required: true
+              schema:
+                 type: integer
+              example: 1
+         responses:
+            '200':
+               description: Successfully retrieved user details
+               content:
+                  application/json:
+                     schema:
+                        $ref: '#/components/schemas/User'
+            '400':
+               description: User not found
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           error:
+                              type: string 
+                              example: User not found 
+         put:
+            summary: Edit user details
+            description: Allows users to update their details
+            tags:
+               - Users
+            security:
+               - BearerAuth: []
+            parameters:
+               - name: userId
+                 in: path
+                 required: true
+                 schema:
+                    type: integer
+                 example: 1
+            requestBody:
+               required: true
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           username:
+                              type: string
+                           passwordHash:
+                              type: string
+                           email:
+                              type: string
+            responses:
+               '200':
+                  description: Successfully edited user details
+                  content:
+                     application/json:
+                        schema:
+                           $ref: '#/components/schemas/User'
+               '404':
+                  description: User not found
+                  content:
+                     application/json:
+                        schema:
+                           type: object
+                           properties:
+                              error:
+                                 type: string
+
+   /blogs:
+      post:
+         summary: Creates new blog
+         description: Makes a new blog
+         tags:
+            - Blogs
+         security: 
+            - BearerAuth: []
+         requestBody:
+            required: true
+            content:
+               application/json:
+                  schema:
+                     type: object
+                     properties:
+                        title:
+                           type: string
+                           example: My Blog
+                        content:
+                           type: string
+                           example: This is my first blog
+                     required:
+                        - title
+                        - content
+         responses:
+            '200':
+               description: Successfully created new blog
+               content:
+                  application/json: 
+                     schema:
+                        $ref: '#/components/schemas/Blog'
+            '400':
+               description: Invalid
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           error:
+                              type: string
+                              example: Invalid
+                    
+      get:
+         summary: Retrieve all blogs
+         description: Gets a list of all blogs
+         tags:
+            - Blogs
+         security: []
+         responses:
+            '200':
+               description: Successfully retrieved all blogs
+               content:
+                  application/json:
+                     schema:
+                        type: array
+                        items:
+                           $ref: '#/components/schemas/Blog'
+
+   /blogs/{blogId}:
+      get:
+         summary: Retrieves blog details
+         description: Gets details about a certain blog
+         tags:
+            - Blogs
+         security: []
+         parameters:
+            - name: blogId
+              in: path
+              required: true
+              schema:
+                 type: integer
+                 example: 1
+         responses:
+            '200':
+               description: Successfully retrieved blog details
+               content:
+                  application/json:
+                     schema:
+                        $ref: '#/components/schemas/Blog'
+            '400':
+               description: Blog not found
+               content:
+                  application/json:
+                     schema:
+                        type: object    
+                        properties:
+                           error:
+                              type: string  
+                              example: Blog not found              
+         put:
+            summary: Edit details
+            description: Allows to edit details of a blog
+            tags:
+               - Blogs
+            security:
+               - BearerAuth: []
+            parameters:
+               - name: blogId
+                 in: path
+                 required: true
+                 schema:
+                    type: integer
+                 example: 1
+            requestBody:
+               required: true
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           title:
+                              type: string
+                              example: New Title
+                           content:
+                              type: string
+                              example: New content
+            responses:
+               '200':
+                  description: Successfully edited blog
+                  content:
+                     application/json:
+                        schema:
+                           $ref: '#/components/schemas/Blog'
+            delete:
+               summary: Delete a blog
+               description: Deletes a certain blog from the database
+               tags:
+                  - Blogs
+               security:
+                  - BearerAuth: []
+               parameters:
+                  - name: blogId
+                    in: path
+                    required: true
+                    schema:
+                       type: integer
+                    example: 1
+                                            
+   /blogs/{blogId}/like:
+      post:
+         summary: Like a blog
+         description: Allows users to add a like to a certain blog
+         tags:
+            - Blogs
+         security:
+            - BearerAuth: []
+         parameters:
+            - name: blogId
+              in: path
+              required: true
+              schema:
+                 type: integer
+              example: 1
+         responses:
+            '200':
+               description: Successfully added like
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           message:
+                              type: string
+                              example: Successfully liked
+            '400':
+               description: Blog not found
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           error:
+                              type: string
+                              example: Blog not found
+                                                
+   /blogs/{blogId}/unlike:
+      post:
+         summary: Unlike a blog
+         description: Removes a like from a certain blog
+         tags:
+            - Blogs
+         security:
+            - BearerAuth: []
+         parameters:
+            - name: blogId
+              in: path
+              required: true
+              schema:
+                 type: integer
+              example: 1
+         responses:
+            '200':
+               description: Successfully unliked a blog
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           message:
+                              type: string
+                              example: Successfully unliked
+            '400':
+               description: Blog not found
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           error:
+                              type: string 
+                              example: Blog not found                 
+                                                    
+   /blogs/{blogId}/comment:
+      post:
+         summary: Add a comment to a blog
+         description: Adds a comment to a certain blog
+         tags:
+            - Blogs
+         security:
+            - BearerAuth: []
+         parameters:
+            - name: blogId
+              in: path
+              required: true
+              schema:
+                 type: integer
+              example: 1
+         requestBody:
+            required: true
+            content:
+               application/json:
+                  schema:
+                     type: object
+                     properties:
+                        content:
+                           type: string
+                           example: Love this blog
+                     required:
+                        - content              
+         responses:
+            '200':
+               description: Successfully added comment  
+               content:
+                  application/json:
+                     schema:
+                        $ref: '#/components/schemas/Comment'      
+            '400':
+               description: Blog not found
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           error:
+                              type: string
+                              example: Blog not found
+                              
+      get:
+         summary: Get comments 
+         description: Gets comments from a certain blog
+         tags:
+            - Blogs
+         security:
+            - BearerAuth: []
+         parameters:
+            - name: blogId
+              in: path
+              required: true
+              schema:
+                 type: integer
+              example: 1
+         responses:
+            '200': 
+               description: Successfully retrieved a list of comments
+               content:
+                  application/json:
+                     schema:
+                        type: array
+                        items:
+                           $ref: '#/components/schemas/Comment'      
+            '400':
+               description: Blog not found
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           error:
+                              type: string
+                              example: Blog not found
+                  
+   /comments/{commentId}:
+      delete:
+         summary: Delete a comment
+         description: Deletes a certain comment
+         security:
+            - BearerAuth: []
+         parameters:
+            - name: commentId
+              in: path
+              required: true
+              schema:
+                 type: integer
+              example: 1
+         responses:
+            '200':
+               description: Successfully deleted comment
+            '400':
+               description: Comment not found
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           error:
+                              type: string
+                              example: Comment not found
+
+components:
+   securitySchemes:
+      BearerAuth:
+         type: http
+         scheme: bearer
+         bearerFormat: JWT
+         
+   schemas:
+      Login:
+         type: object
+         properties:
+            username:
+               type: string
+               example: sierrah
+            password:
+               type: string
+               example: password
+         required:
+            - username
+            - password
+      User:
+         type: object
+         properties:
+            userId:
+               type: integer
+               example: 1
+            username:
+               type: string
+               example: sierrah
+            email:
+               type: string
+               example: sierra.howe@unb.ca
+         required:
+            - userId
+            - username
+            - email  
+                  
+      Blog:
+         type: object
+         properties:
+            blogId:
+               type: integer
+               example: 1
+            userId:
+               type: string
+               example: sierrah
+            title:
+               type: string
+               example: My Blog
+            content:
+               type: string
+               example: Welcome to my blog
+            likes:
+               type: integer
+               example: 25
+            comments:
+               type: integer
+               example: 25
+         required:
+            - blogId
+            - userId
+            - title
+            - content   
+      
+      Comment:
+         type: object
+         properties:
+            commentId:
+               type: integer
+               example: 1
+            blogId:
+               type: integer
+               example: 1
+            userId:
+               type: integer
+               example: 1
+            content:
+               type: string
+               example: Love this blog
+         required:
+            - commentId
+            - blogId
+            - userId
+            - content
+
