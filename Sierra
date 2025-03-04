@@ -56,7 +56,7 @@ paths:
     post:
       summary: Register and create a new user
       tags:
-        - Authentication
+        - Authenticator
       requestBody:
         required: true
         content:
@@ -66,8 +66,23 @@ paths:
       responses:
         "201":
           description: User registration successful
+          content:
+            application/json:
+               schema:
+                  type: object
+                  properties:
+                     type: string
+                     example: User registration successful 
         "400":
           description: Bad request
+          content:
+            application/json:
+               schema:
+                  type: object
+                  properties:
+                     error:
+                        type: string
+                        example: Failed to register user
       security: []
       deprecated: false
    
