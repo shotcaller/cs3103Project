@@ -50,7 +50,26 @@ paths:
                         properties:
                            error:
                               type: string
-                              example: User not authorized        
+                              example: User not authorized
+
+   /register:
+    post:
+      summary: Register and create a new user
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        "201":
+          description: User registration successful
+        "400":
+          description: Bad request
+      security: []
+      deprecated: false
    
    
    /users:
