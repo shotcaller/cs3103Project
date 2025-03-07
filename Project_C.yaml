@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
-   description: This is an API for a Blog System
+   description: This is an API for a Blog System called Bloggster
    version: 1.0.0
-   title: API for managing blogs, users, likes, and comments
+   title: Bloggster - API for managing blogs, users, likes, and comments
    
 servers:
    - url: https://cs3103.cs.unb.ca:8033/
