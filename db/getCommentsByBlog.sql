@@ -2,13 +2,15 @@ DELIMITER //
 DROP PROCEDURE IF EXISTS getCommentsByBlog //
 CREATE PROCEDURE getCommentsByBlog(IN blogId INT)
 BEGIN
-   IF NOT EXISTS (SELECT 1 FROM Blogs WHERE BlogId = blodId) THEN
+   IF NOT EXISTS (SELECT 1 FROM Blogs WHERE Blogs.blogId = blogId) THEN
       SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'This Blog does not exist';
    END IF;
    
-   SELECT CommentId, Content
+   -- Need to join Users to get userName from Comments.userId
+
+   SELECT commentId, content
    FROM Comments
-   WHERE BlogId = blodId;
+   WHERE Comments.blogId = blogId;
 
 END //
 
