@@ -10,12 +10,8 @@ BEGIN
       SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'This User does not exist';
    END IF;
    
-   INSERT INTO Likes(blogId, userId) VALUES (blogId, userId);
-
-   -- UPDATE Blogs
-   -- SET likeCount = likeCount + 1
-   -- WHERE Blogs.blogId = blogId;
-
+   INSERT INTO Likes(blogId, userId)
+   VALUES(blogID, userID);
    
 
 END //
