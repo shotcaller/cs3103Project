@@ -2,7 +2,7 @@ DELIMITER //
 DROP PROCEDURE IF EXISTS getAllUsers //
 CREATE PROCEDURE getAllUsers()
 BEGIN
-   SELECT UserId, Username
+   SELECT userId, userName
    FROM Users;
 
 END //

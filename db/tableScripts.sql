@@ -11,7 +11,7 @@ CREATE TABLE Blogs (
     userId int not null,
     title varchar(255),
     content text,
-    createdAt timestamp,
+    createdAt timestamp default CURRENT_TIMESTAMP,
     primary key(blogId),
     foreign key(userId) references Users(userId) on delete cascade
 );
@@ -29,7 +29,7 @@ CREATE TABLE Comments (
     blogId int not null,
     userId int not null,
     content text not null,
-    createdAt timestamp,
+    createdAt timestamp default CURRENT_TIMESTAMP,
     primary key(commentId),
     foreign key(blogId) references Blogs(blogId) on delete cascade,
     foreign key(userId) references Users(userId) on delete cascade
