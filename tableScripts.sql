@@ -19,6 +19,7 @@ CREATE TABLE Blogs (
 CREATE TABLE Likes (
 	blogId int not null,
     userId int not null,
+    primary key(userId, blogId),
     foreign key(userId) references Users(userId),
     foreign key(blogId) references Blogs(blogId)
 );
