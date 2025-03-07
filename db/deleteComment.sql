@@ -1,24 +1,13 @@
 DELIMITER //
 DROP PROCEDURE IF EXISTS deleteComment //
-CREATE PROCEDURE deleteComment(IN commentId INT)
+CREATE PROCEDURE deleteComment(IN commentID INT)
 BEGIN
-   IF NOT EXISTS (SELECT 1 FROM Comments WHERE Comments.commentId = commentId) THEN
+   IF NOT EXISTS (SELECT 1 FROM Comments WHERE commentId = commentID) THEN
       SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'This Comment does not exist';
    END IF;
-   
-   -- DECLARE blogId INT;
-   
-   -- SELECT BlogId INTO blogId
-   -- FROM Comments
-   -- WHERE CommentId = commentId;
-   
+ 
    DELETE FROM Comments
-   WHERE CommentId = commentId;
-   
-   -- UPDATE Blogs
-   -- SET commentCount = GREATEST(commentCount - 1, 0);
-   -- WHERE BlogId = blogId;
-
+   WHERE commentId = commentID;
 END //
 
 DELIMITER ;
