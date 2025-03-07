@@ -13,15 +13,15 @@ CREATE TABLE Blogs (
     content text,
     createdAt timestamp,
     primary key(blogId),
-    foreign key(userId) references Users(userId)
+    foreign key(userId) references Users(userId) on delete cascade
 );
 
 CREATE TABLE Likes (
 	blogId int not null,
     userId int not null,
     primary key(userId, blogId),
-    foreign key(userId) references Users(userId),
-    foreign key(blogId) references Blogs(blogId)
+    foreign key(userId) references Users(userId) on delete cascade,
+    foreign key(blogId) references Blogs(blogId) on delete cascade
 );
 
 CREATE TABLE Comments (
@@ -31,8 +31,8 @@ CREATE TABLE Comments (
     content text not null,
     createdAt timestamp,
     primary key(commentId),
-    foreign key(blogId) references Blogs(blogId),
-    foreign key(userId) references Users(userId)
+    foreign key(blogId) references Blogs(blogId) on delete cascade,
+    foreign key(userId) references Users(userId) on delete cascade
 );
 
 CREATE TABLE UserProfile (
@@ -40,18 +40,18 @@ CREATE TABLE UserProfile (
     profilePhoto varchar(255),
     createdAt timestamp,
     primary key(userId),
-    foreign key(userId) references Users(userId)
+    foreign key(userId) references Users(userId) on delete cascade
 );
 
 CREATE TABLE VerifiedUsers (
 	userId int not null primary key,
-    foreign key(userId) references Users(userId)
+    foreign key(userId) references Users(userId) on delete cascade
 );
 
 CREATE TABLE Verification (
 	userId int not null primary key,
     verificationHash varchar(255),
     verifiedAt timestamp,
-    foreign key(userId) references Users(userId)
+    foreign key(userId) references Users(userId) on delete cascade
 );
 
