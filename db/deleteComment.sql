@@ -13,7 +13,7 @@ BEGIN
    -- WHERE CommentId = commentId;
    
    DELETE FROM Comments
-   WHERE CommentId = commentId;
+   WHERE Comments.commentId = commentId;
    
    -- UPDATE Blogs
    -- SET commentCount = GREATEST(commentCount - 1, 0);

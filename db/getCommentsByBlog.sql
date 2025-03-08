@@ -8,9 +8,9 @@ BEGIN
    
    -- Need to join Users to get userName from Comments.userId
 
-   SELECT commentId, content
-   FROM Comments
-   WHERE Comments.blogId = blogId;
+   SELECT c.commentId, c.blogId, c.userId, u.userName, c.content, c.createdAt
+   FROM Comments c JOIN Users u ON c.userId = u.userId
+   WHERE c.blogId = blogId;
 
 END //
 
