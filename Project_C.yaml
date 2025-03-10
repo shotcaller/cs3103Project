@@ -85,6 +85,41 @@ paths:
                         example: Failed to register user
       security: []
       deprecated: false
+
+   /verify-email:
+      get:
+         summary: Verify user's email using a token
+         tags:
+            - Authenticator
+         parameters:
+          - name: token
+            in: query
+            required: true
+            schema:
+               type: string
+               example: "abc123xyz"
+         responses:
+            "200":
+               description: Email successfully verified
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           message:
+                              type: string
+                              example: Email verified successfully. You can now log in.
+            "400":
+               description: Invalid or expired token
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           error:
+                              type: string
+                              example: Invalid or expired verification token
+
    
    
    /users:
