@@ -65,14 +65,14 @@ paths:
               $ref: '#/components/schemas/RegisterRequest'
       responses:
         "201":
-          description: User registration successful
+          description: User registration successful. Verification email sent.
           content:
             application/json:
                schema:
                   type: object
                   properties:
                      type: string
-                     example: User registration successful 
+                     example: User registration successful. Please verify your email.
         "400":
           description: Bad request
           content:
@@ -93,7 +93,8 @@ paths:
          description: Get a list of all registered users
          tags:
             - Users
-         security: []
+         security: 
+            - BearerAuth: []
          responses:
             '200':
                description: Successfully retrieved all users
@@ -205,7 +206,7 @@ paths:
                         - title
                         - content
          responses:
-            '200':
+            '201':
                description: Successfully created new blog
                content:
                   application/json: 
@@ -407,8 +408,7 @@ paths:
          description: Gets comments from a certain blog
          tags:
             - Blogs
-         security:
-            - BearerAuth: []
+         security: []
          parameters:
             - name: blogId
               in: path
@@ -489,10 +489,16 @@ components:
       properties:
         username:
           type: string
+          example: sierrah
         password: 
           type: string
         email:
           type: string
+          example: sierrah@unb.ca
+      required:
+         - username
+         - password
+         - email
 
 
       User:
@@ -507,6 +513,9 @@ components:
             email:
                type: string
                example: sierra.howe@unb.ca
+            verified:
+               type: boolean
+               example: false
          required:
             - userId
             - username
@@ -518,9 +527,12 @@ components:
             blogId:
                type: integer
                example: 1
-            userId:
+            username:
                type: string
                example: sierrah
+            userId:
+               type: integer
+               example: 101
             title:
                type: string
                example: My Blog
