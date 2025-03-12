@@ -1,58 +1,72 @@
 openapi: 3.0.0
 info:
-   description: This is an API for a Blog System called Bloggster
-   version: 1.0.0
-   title: Bloggster - API for managing blogs, users, likes, and comments
-   
+  description: This is an API for a Blog System called Bloggster
+  version: 1.0.0
+  title: Bloggster - API for managing blogs, users, likes, and comments
+
 servers:
-   - url: https://cs3103.cs.unb.ca:8033/
-   
+  - url: https://cs3103.cs.unb.ca:8033/
 
 security:
-   - SessionAuth: []
-   
-tags:
-   - name: Authenticator
-     description: A way to authenticate users
-   - name: Users
-     description: Managing users
-   - name: Blogs
-     description: Managing Blogs
-         
-paths:
-   /login:
-      post:
-         summary: Authenticate user and log them in
-         tags:
-            - Authenticator
-         requestBody:
-            required: true
-            content:
-               application/json:
-                  schema:
-                     $ref: '#/components/schemas/Login' 
-         responses:
-            '200':
-               description: Successfully logged in user
-               content:
-                  application/json:
-                     schema:
-                        type: object
-                        properties:
-                           token:
-                              type: string
-            '400':
-               description: User not authorized
-               content:
-                  application/json:
-                     schema:
-                        type: object
-                        properties:
-                           error:
-                              type: string
-                              example: User not authorized
+  - SessionAuth: []
 
-   /register:
+tags:
+  - name: Authenticator
+    description: A way to authenticate users
+  - name: Users
+    description: Managing users
+  - name: Blogs
+    description: Managing Blogs
+  - name: Comments
+    description: Managing Comments
+
+paths:
+  /login:
+    post:
+      summary: Authenticate user and log them in
+      tags:
+        - Authenticator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        '200':
+          description: Successfully logged in user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '400':
+          description: User not authorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: User not authorized
+
+  /logout:
+    post:
+      summary: Log out the user
+      tags:
+        - Authenticator
+      security:
+        - SessionAuth: []
+      responses:
+        '200':
+          description: Successfully logged out
+        '401':
+          description: Unauthorized
+
+  /register:
     post:
       summary: Register and create a new user
       tags:
@@ -64,549 +78,605 @@ paths:
             schema:
               $ref: '#/components/schemas/RegisterRequest'
       responses:
-        "201":
+        '201':
           description: User registration successful. Verification email sent.
           content:
             application/json:
-               schema:
-                  type: object
-                  properties:
-                     type: string
-                     example: User registration successful. Please verify your email.
-        "400":
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User registration successful. Please verify your email.
+        '400':
           description: Bad request
           content:
             application/json:
-               schema:
-                  type: object
-                  properties:
-                     error:
-                        type: string
-                        example: Failed to register user
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Failed to register user
       security: []
-      deprecated: false
 
-   /verify-email:
-      get:
-         summary: Verify user's email using a token
-         tags:
-            - Authenticator
-         parameters:
-          - name: token
-            in: query
-            required: true
+  /verify-email:
+    get:
+      summary: Verify user's email using a token
+      tags:
+        - Authenticator
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "abc123xyz"
+      responses:
+        '200':
+          description: Email successfully verified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Email verified successfully. You can now log in.
+        '400':
+          description: Invalid or expired token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid or expired verification token
+
+  /users:
+    get:
+      summary: Retrieve all users
+      description: Get a list of all registered users
+      tags:
+        - Users
+      security:
+        - SessionAuth: []
+      responses:
+        '200':
+          description: Successfully retrieved all users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+  /users/{userId}:
+    get:
+      summary: Retrieve details about user
+      description: Gets details about a certain user
+      tags:
+        - Users
+      security:
+        - SessionAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Successfully retrieved user details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: User not found
+
+    put:
+      summary: Edit user details
+      description: Allows users to update their details
+      tags:
+        - Users
+      security:
+        - SessionAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
             schema:
-               type: string
-               example: "abc123xyz"
-         responses:
-            "200":
-               description: Email successfully verified
-               content:
-                  application/json:
-                     schema:
-                        type: object
-                        properties:
-                           message:
-                              type: string
-                              example: Email verified successfully. You can now log in.
-            "400":
-               description: Invalid or expired token
-               content:
-                  application/json:
-                     schema:
-                        type: object
-                        properties:
-                           error:
-                              type: string
-                              example: Invalid or expired verification token
+              type: object
+              properties:
+                username:
+                  type: string
+                passwordHash:
+                  type: string
+                email:
+                  type: string
+      responses:
+        '200':
+          description: Successfully edited user details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
 
-   
-   
-   /users:
-      get:
-         summary: Retrieve all users
-         description: Get a list of all registered users
-         tags:
-            - Users
-         security: 
-            - SessionAuth: []
-         responses:
-            '200':
-               description: Successfully retrieved all users
-               content:
-                  application/json:
-                     schema:
-                        type: array
-                        items:
-                           $ref: '#/components/schemas/User'
+  /blogs:
+    post:
+      summary: Creates new blog
+      description: Makes a new blog
+      tags:
+        - Blogs
+      security:
+        - SessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: My Blog
+                content:
+                  type: string
+                  example: This is my first blog
+              required:
+                - title
+                - content
+      responses:
+        '201':
+          description: Successfully created new blog
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Blog'
+        '400':
+          description: Invalid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Invalid
 
-   /users/{userId}:
-      get:
-         summary: Retrieve details about user
-         description: Gets details about a certain user
-         tags:
-            - Users
-         security:
-            - SessionAuth: []
-         parameters:
-            - name: userId
-              in: path
-              required: true
+    get:
+      summary: Retrieve all blogs
+      description: Gets a list of all blogs
+      tags:
+        - Blogs
+      security: []
+      responses:
+        '200':
+          description: Successfully retrieved all blogs
+          content:
+            application/json:
               schema:
-                 type: integer
-              example: 1
-         responses:
-            '200':
-               description: Successfully retrieved user details
-               content:
-                  application/json:
-                     schema:
-                        $ref: '#/components/schemas/User'
-            '400':
-               description: User not found
-               content:
-                  application/json:
-                     schema:
-                        type: object
-                        properties:
-                           error:
-                              type: string 
-                              example: User not found 
-         put:
-            summary: Edit user details
-            description: Allows users to update their details
-            tags:
-               - Users
-            security:
-               - SessionAuth: []
-            parameters:
-               - name: userId
-                 in: path
-                 required: true
-                 schema:
-                    type: integer
-                 example: 1
-            requestBody:
-               required: true
-               content:
-                  application/json:
-                     schema:
-                        type: object
-                        properties:
-                           username:
-                              type: string
-                           passwordHash:
-                              type: string
-                           email:
-                              type: string
-            responses:
-               '200':
-                  description: Successfully edited user details
-                  content:
-                     application/json:
-                        schema:
-                           $ref: '#/components/schemas/User'
-               '404':
-                  description: User not found
-                  content:
-                     application/json:
-                        schema:
-                           type: object
-                           properties:
-                              error:
-                                 type: string
+                type: array
+                items:
+                  $ref: '#/components/schemas/Blog'
 
-   /blogs:
-      post:
-         summary: Creates new blog
-         description: Makes a new blog
-         tags:
-            - Blogs
-         security: 
-            - SessionAuth: []
-         requestBody:
-            required: true
-            content:
-               application/json:
-                  schema:
-                     type: object
-                     properties:
-                        title:
-                           type: string
-                           example: My Blog
-                        content:
-                           type: string
-                           example: This is my first blog
-                     required:
-                        - title
-                        - content
-         responses:
-            '201':
-               description: Successfully created new blog
-               content:
-                  application/json: 
-                     schema:
-                        $ref: '#/components/schemas/Blog'
-            '400':
-               description: Invalid
-               content:
-                  application/json:
-                     schema:
-                        type: object
-                        properties:
-                           error:
-                              type: string
-                              example: Invalid
-                    
-      get:
-         summary: Retrieve all blogs
-         description: Gets a list of all blogs
-         tags:
-            - Blogs
-         security: []
-         responses:
-            '200':
-               description: Successfully retrieved all blogs
-               content:
-                  application/json:
-                     schema:
-                        type: array
-                        items:
-                           $ref: '#/components/schemas/Blog'
+  /blogs/{blogId}:
+    get:
+      summary: Retrieves blog details
+      description: Gets details about a certain blog
+      tags:
+        - Blogs
+      security: []
+      parameters:
+        - name: blogId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Successfully retrieved blog details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Blog'
+        '400':
+          description: Blog not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Blog not found
 
-   /blogs/{blogId}:
-      get:
-         summary: Retrieves blog details
-         description: Gets details about a certain blog
-         tags:
-            - Blogs
-         security: []
-         parameters:
-            - name: blogId
-              in: path
-              required: true
+    put:
+      summary: Edit blog details
+      description: Allows to edit details of a blog
+      tags:
+        - Blogs
+      security:
+        - SessionAuth: []
+      parameters:
+        - name: blogId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: New Title
+                content:
+                  type: string
+                  example: New content
+      responses:
+        '200':
+          description: Successfully edited blog
+          content:
+            application/json:
               schema:
-                 type: integer
-                 example: 1
-         responses:
-            '200':
-               description: Successfully retrieved blog details
-               content:
-                  application/json:
-                     schema:
-                        $ref: '#/components/schemas/Blog'
-            '400':
-               description: Blog not found
-               content:
-                  application/json:
-                     schema:
-                        type: object    
-                        properties:
-                           error:
-                              type: string  
-                              example: Blog not found              
-         put:
-            summary: Edit details
-            description: Allows to edit details of a blog
-            tags:
-               - Blogs
-            security:
-               - SessionAuth: []
-            parameters:
-               - name: blogId
-                 in: path
-                 required: true
-                 schema:
-                    type: integer
-                 example: 1
-            requestBody:
-               required: true
-               content:
-                  application/json:
-                     schema:
-                        type: object
-                        properties:
-                           title:
-                              type: string
-                              example: New Title
-                           content:
-                              type: string
-                              example: New content
-            responses:
-               '200':
-                  description: Successfully edited blog
-                  content:
-                     application/json:
-                        schema:
-                           $ref: '#/components/schemas/Blog'
-            delete:
-               summary: Delete a blog
-               description: Deletes a certain blog from the database
-               tags:
-                  - Blogs
-               security:
-                  - SessionAuth: []
-               parameters:
-                  - name: blogId
-                    in: path
-                    required: true
-                    schema:
-                       type: integer
-                    example: 1
-                                            
-   /blogs/{blogId}/like:
-      post:
-         summary: Like or unlike a blog
-         description: Allows users to add a like or unlike to a certain blog
-         tags:
-            - Blogs
-         security:
-            - SessionAuth: []
-         parameters:
-            - name: blogId
-              in: path
-              required: true
+                $ref: '#/components/schemas/Blog'
+
+    delete:
+      summary: Delete a blog
+      description: Deletes a certain blog from the database
+      tags:
+        - Blogs
+      security:
+        - SessionAuth: []
+      parameters:
+        - name: blogId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Successfully deleted blog
+        '400':
+          description: Blog not found
+          content:
+            application/json:
               schema:
-                 type: integer
-              example: 1
-         responses:
-            '200':
-               description: Successfully added or removed a like 
-               content:
-                  application/json:
-                     schema:
-                        type: object
-                        properties:
-                           message:
-                              type: string
-                              example: Successfully liked
-            '400':
-               description: Blog not found
-               content:
-                  application/json:
-                     schema:
-                        type: object
-                        properties:
-                           error:
-                              type: string
-                              example: Blog not found
-                                                
-                    
-                                                    
-   /blogs/{blogId}/comment:
-      post:
-         summary: Add a comment to a blog
-         description: Adds a comment to a certain blog
-         tags:
-            - Blogs
-         security:
-            - SessionAuth: []
-         parameters:
-            - name: blogId
-              in: path
-              required: true
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Blog not found
+
+  /blogs/{blogId}/like:
+    post:
+      summary: Like or unlike a blog
+      description: Allows users to add a like or unlike to a certain blog
+      tags:
+        - Blogs
+      security:
+        - SessionAuth: []
+      parameters:
+        - name: blogId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Successfully added or removed a like
+          content:
+            application/json:
               schema:
-                 type: integer
-              example: 1
-         requestBody:
-            required: true
-            content:
-               application/json:
-                  schema:
-                     type: object
-                     properties:
-                        content:
-                           type: string
-                           example: Love this blog
-                     required:
-                        - content              
-         responses:
-            '200':
-               description: Successfully added comment  
-               content:
-                  application/json:
-                     schema:
-                        $ref: '#/components/schemas/Comment'      
-            '400':
-               description: Blog not found
-               content:
-                  application/json:
-                     schema:
-                        type: object
-                        properties:
-                           error:
-                              type: string
-                              example: Blog not found
-                              
-      get:
-         summary: Get comments 
-         description: Gets comments from a certain blog
-         tags:
-            - Blogs
-         security: []
-         parameters:
-            - name: blogId
-              in: path
-              required: true
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Successfully liked
+        '400':
+          description: Blog not found
+          content:
+            application/json:
               schema:
-                 type: integer
-              example: 1
-         responses:
-            '200': 
-               description: Successfully retrieved a list of comments
-               content:
-                  application/json:
-                     schema:
-                        type: array
-                        items:
-                           $ref: '#/components/schemas/Comment'      
-            '400':
-               description: Blog not found
-               content:
-                  application/json:
-                     schema:
-                        type: object
-                        properties:
-                           error:
-                              type: string
-                              example: Blog not found
-                  
-   /comments/{commentId}:
-      delete:
-         summary: Delete a comment
-         description: Deletes a certain comment
-         security:
-            - SessionAuth: []
-         parameters:
-            - name: commentId
-              in: path
-              required: true
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Blog not found
+
+  /blogs/{blogId}/comment:
+    post:
+      summary: Add a comment to a blog
+      description: Adds a comment to a certain blog
+      tags:
+        - Comments
+      security:
+        - SessionAuth: []
+      parameters:
+        - name: blogId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  example: Love this blog
+              required:
+                - content
+      responses:
+        '200':
+          description: Successfully added comment
+          content:
+            application/json:
               schema:
-                 type: integer
-              example: 1
-         responses:
-            '200':
-               description: Successfully deleted comment
-            '400':
-               description: Comment not found
-               content:
-                  application/json:
-                     schema:
-                        type: object
-                        properties:
-                           error:
-                              type: string
-                              example: Comment not found
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: Blog not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Blog not found
+
+    get:
+      summary: Get comments
+      description: Gets comments from a certain blog
+      tags:
+        - Comments
+      security: []
+      parameters:
+        - name: blogId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Successfully retrieved a list of comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '400':
+          description: Blog not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Blog not found
+
+  /comments/{commentId}:
+    put:
+      summary: Edit a comment
+      description: Allows users to edit their comments
+      tags:
+        - Comments
+      security:
+        - SessionAuth: []
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  example: Updated comment
+              required:
+                - content
+      responses:
+        '200':
+          description: Successfully edited comment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          description: Comment not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Comment not found
+
+    delete:
+      summary: Delete a comment
+      description: Deletes a certain comment
+      tags:
+        - Comments
+      security:
+        - SessionAuth: []
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Successfully deleted comment
+        '400':
+          description: Comment not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Comment not found
 
 components:
-   securitySchemes:
-      SessionAuth:
-         type: apiKey
-         in: cookie
-         name: sessionId
-         
-   schemas:
-      Login:
-         type: object
-         properties:
-            username:
-               type: string
-               example: sierrah
-            password:
-               type: string
-               example: password
-         required:
-            - username
-            - password
+  securitySchemes:
+    SessionAuth:
+      type: apiKey
+      in: cookie
+      name: sessionId
 
-      RegisterRequest:
+  schemas:
+    Login:
       type: object
       properties:
         username:
           type: string
           example: sierrah
-        password: 
+        password:
+          type: string
+          example: password
+      required:
+        - username
+        - password
+
+    RegisterRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          example: sierrah
+        password:
           type: string
         email:
           type: string
           example: sierrah@unb.ca
       required:
-         - username
-         - password
-         - email
+        - username
+        - password
+        - email
 
+    User:
+      type: object
+      properties:
+        userId:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: sierrah
+        email:
+          type: string
+          example: sierra.howe@unb.ca
+        verified:
+          type: boolean
+          example: false
+      required:
+        - userId
+        - username
+        - email
 
-      User:
-         type: object
-         properties:
-            userId:
-               type: integer
-               example: 1
-            username:
-               type: string
-               example: sierrah
-            email:
-               type: string
-               example: sierra.howe@unb.ca
-            verified:
-               type: boolean
-               example: false
-         required:
-            - userId
-            - username
-            - email  
-                  
-      Blog:
-         type: object
-         properties:
-            blogId:
-               type: integer
-               example: 1
-            username:
-               type: string
-               example: sierrah
-            userId:
-               type: integer
-               example: 101
-            title:
-               type: string
-               example: My Blog
-            content:
-               type: string
-               example: Welcome to my blog
-            likes:
-               type: integer
-               example: 25
-            comments:
-               type: integer
-               example: 25
-            liked:
-               type: boolean
-               example: true
-         required:
-            - blogId
-            - userId
-            - title
-            - content   
-      
-      Comment:
-         type: object
-         properties:
-            commentId:
-               type: integer
-               example: 1
-            blogId:
-               type: integer
-               example: 1
-            userId:
-               type: integer
-               example: 1
-            content:
-               type: string
-               example: Love this blog
-         required:
-            - commentId
-            - blogId
-            - userId
-            - content
+    Blog:
+      type: object
+      properties:
+        blogId:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: sierrah
+        userId:
+          type: integer
+          example: 101
+        title:
+          type: string
+          example: My Blog
+        content:
+          type: string
+          example: Welcome to my blog
+        likes:
+          type: integer
+          example: 25
+        comments:
+          type: integer
+          example: 25
+        liked:
+          type: boolean
+          example: true
+      required:
+        - blogId
+        - userId
+        - title
+        - content
 
+    Comment:
+      type: object
+      properties:
+        commentId:
+          type: integer
+          example: 1
+        blogId:
+          type: integer
+          example: 1
+        userId:
+          type: integer
+          example: 1
+        content:
+          type: string
+          example: Love this blog
+      required:
+        - commentId
+        - blogId
+        - userId
+        - content
