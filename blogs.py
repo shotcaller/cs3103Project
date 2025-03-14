@@ -12,10 +12,11 @@ cgitb.enable()
 from db_util import db_access
 import settings
 
+
 app = Flask(__name)
 app = Api(app)
 
-@app.errorhandler(400)  # decorators to add to 400 response
+@app.errorhandler(400)  
 def not_found(error):
     return make_response(jsonify({"status": "Bad request"}), 400)
     
@@ -46,6 +47,9 @@ class Blogs(Resource):
    except Exception as e:
       abort(500, message=e)  # server error
    return make_response(jsonify({"blogs": rows}), 200)
+   
+   
+   
 
 class CommentAttributes(Resource):
    def get(self):
@@ -55,7 +59,7 @@ class CommentAttributes(Resource):
       rows = db_access(sqlProc, sqlArgs)
    except Exception as e:
       abort(500, message=e)
-   return make_response(jsonify({'blogs':rows}), 200)
+   return make_response(jsonify({'comments':rows}), 200)
    
    def post(self):
    if not request.json or not 'blogId' in request.json or not 'userId' in request.json or not 'content' in request.json:
@@ -71,7 +75,13 @@ class CommentAttributes(Resource):
       row = db_access(sqlProc, sqlArgs)
    except Exception as e:
       abort(500, message=e)
-   return make_reponse
+   return make_reponse(jsonify({'comments':rows}), 200)
+   
+
+class BlogAttributes(Resource):
+   def get(self):
+   sqlProc = ''
+   
       
 
 
