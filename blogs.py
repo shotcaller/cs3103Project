@@ -112,7 +112,7 @@ class BlogAttributes(Resource):
          rows = db_access(sqlProc, sqlArgs)
       except Exception as e:
          abort(500, message=e)
-      return make_response(jsonify({"message":"Blog updated", "blogs":row}), 200)
+      return make_response(jsonify({"message":"Blog updated", "blogs":rows}), 200)
    
    def delete(self):
    sqlProc = 'deleteBlog'
@@ -122,24 +122,62 @@ class BlogAttributes(Resource):
    except Exception as e:
       abort(500, message=e)
    return make_response('', 200)
+   
 
-class LikeAttributes:
-   def post(self)
+class BlogByUser:
+   def get(self):
+   sqlProc = 'getAllBlogsByUser'
+   sqlArgs = [userId]
+   try:
+      rows = db_access(sqlProc, sqlArgs)
+   except Exception as e:
+      abort(500, message=e)
+   return make_response(jsonify({"blogs":rows}), 200)
+   
+
+class Like:
+   def post(self):
+   if not request.json or not 'blogId' in request.json or not 'userId' in request.json:
+      abort(400)
+      
+   blogId = request.json["blodId"]
+   userId = request.json["userId"]
+   
+   
+   sqlProc = 'likeBlog'
+   sqlArgs = [blodId, userId]
+   try:
+      row = db_access(sqlProc, sqlArgs)
+   except Exception as e:
+      abort(500, message=e)
+   return make_reponse(jsonify({"message": "Blog was liked", 'likes':rows}), 200)
+   
+class Unlike:
+   def post(self):
+   if not request.json or not 'blogId' in request.json or not 'userId' in request.json:
+      abort(400)
+      
+   blogId = request.json["blodId"]
+   userId = request.json["userId"]
+   
+   
+   sqlProc = 'unlikeBlog'
+   sqlArgs = [blodId, userId]
+   try:
+      row = db_access(sqlProc, sqlArgs)
+   except Exception as e:
+      abort(500, message=e)
+   return make_reponse(jsonify({"message": "Blog was unliked", 'likes':rows}), 200)
+   
    
       
-   
-   
-      
-
+        
+api.add_resource(Like, "/blogs/{blogId}/like")
+api.add_resource(BlogsByUser, "/blogs")
+api.add_resource(Unlike, "blogs/{blogId}/like")
 api.add_resource(BlogAttributes, "/blogs/{blogId}")
 api.add_resource(Blogs, "/blogs")
 api.add_resource(CommentAttributes, "/blogs/{blogId}/comment")
 
 if __name__ == "__main__":
    app.run(host=settings.APP_HOST, port=settings.APP_PORT, debug=True)
-   
-      
-
-
-api.add_resource(Blogs, "/blogs")
-api.add_resource(CommentAttributes, "/blogs/{blogId}/comment")
