@@ -1,8 +1,8 @@
 DELIMITER //
-DROP PROCEDURE IF EXISTS getUser //
-CREATE PROCEDURE getUserID(userIdIn int)
+DROP PROCEDURE IF EXISTS getUserById //
+CREATE PROCEDURE getUserByID(userIdIn int)
     BEGIN
-        SELECT * FROM users where userIdIn = userId
+        SELECT * FROM Users where userId = userIdIn;
 
 END //
 DELIMITER 
