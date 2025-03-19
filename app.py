@@ -16,11 +16,11 @@ api = Api(app)
 
 @app.errorhandler(400)
 def bad_request(error):
-    return make_response(jsonify({"status": "Bad request"}), 400)
+    return make_response(jsonify({"status": "Bad request", "message": str(error)}), 400)
 
 @app.errorhandler(500)
 def internal_server_error(error):
-    return make_response(jsonify({"status": "Internal server error"}), 500)
+    return make_response(jsonify({"status": "Internal server error", "message": str(error)}), 500)
 
 
 class Root(Resource):
