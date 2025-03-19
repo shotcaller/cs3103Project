@@ -28,7 +28,7 @@
 
 import pymysql
 import pymysql.cursors
-import settings  
+from settings import settings 
 
 def db_access(sqlProc, sqlArgs=()):
     #"""Executes a stored procedure and returns fetched rows or an error."""

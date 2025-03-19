@@ -6,17 +6,17 @@ CREATE PROCEDURE editUser(
     IN newPasswordHash VARCHAR(255)
 )
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM users WHERE userId = userIdIn) THEN
+    IF NOT EXISTS (SELECT 1 FROM Users WHERE userId = userIdIn) THEN
         SIGNAL SQLSTATE '45000' 
         SET MESSAGE_TEXT = 'User not found';
     END IF;
     
-    IF newUsername IS NOT NULL AND EXISTS (SELECT 1 FROM users WHERE userName = newUsername AND userId != userIdIn) THEN
+    IF newUsername IS NOT NULL AND EXISTS (SELECT 1 FROM Users WHERE userName = newUsername AND userId != userIdIn) THEN
         SIGNAL SQLSTATE '45000' 
         SET MESSAGE_TEXT = 'Username already taken';
     END IF;
 
-    UPDATE users
+    UPDATE Users
     SET 
         userName = COALESCE(newUsername, userName),
         passwordHash = COALESCE(newPasswordHash, passwordHash)

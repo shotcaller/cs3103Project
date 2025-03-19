@@ -1,16 +1,17 @@
 from flask import Flask, make_response, jsonify
 from flask_session import Session
 from flask_restful import Resource, Api
-import settings
+from app.blogs import *
+from settings.settings import *
+from app.authenticator import *
+from app.users import *
 
-from api.authenticator import *
-from api.blogs import *
 
 app = Flask(__name__)
-app.secret_key = settings.SECRET_KEY
+app.secret_key = SECRET_KEY
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_COOKIE_NAME'] = 'bloggsterCookie'
-app.config['SESSION_COOKIE_DOMAIN'] = settings.APP_HOST
+app.config['SESSION_COOKIE_DOMAIN'] = APP_HOST
 Session(app)
 api = Api(app)
 
@@ -34,6 +35,11 @@ api.add_resource(Logout, '/logout')
 api.add_resource(Register, '/register')
 api.add_resource(VerifyEmail, '/verify-email')
 
+#Users
+api.add_resource(Users, '/users')
+api.add_resource(UsersById, "/users/<int:userId>")
+api.add_resource(UsersByUsername, "/users/<string:username>")
+
 #Blogs
 api.add_resource(Blogs, '/blogs')
 api.add_resource(CommentAttributes, "/blogs/<int:blogId>/comment")
@@ -46,4 +52,4 @@ api.add_resource(Unlike, "/blogs/<int:blogId>/unlike")
 
 
 if __name__ == '__main__':
-    app.run(debug=settings.APP_DEBUG)
+    app.run(debug=APP_DEBUG)

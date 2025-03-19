@@ -1,7 +1,6 @@
 from flask import Flask, request, make_response, jsonify, abort, session
 from flask_restful import Resource, Api
-import settings
-from db_util import db_access
+from app.db_util import db_access
 
 class Blogs(Resource):
     #Open endpoint

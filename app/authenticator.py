@@ -1,7 +1,7 @@
 from flask import request, make_response, jsonify, session, abort
 
 from flask_restful import Resource
-from db_util import db_access
+from app.db_util import db_access
 import bcrypt
 import uuid
 import settings

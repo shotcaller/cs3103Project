@@ -2,8 +2,8 @@ DELIMITER //
 DROP PROCEDURE IF EXISTS getAllUsers //
 CREATE PROCEDURE getAllUsers()
 BEGIN
-   SELECT userId, userName
-   FROM Users;
+   SELECT u.userId, u.userName, u.email, p.profilePhoto 
+   FROM Users u JOIN UserProfile p on u.userId = p.userId;
 
 END //
 
