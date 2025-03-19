@@ -1,9 +1,10 @@
 DELIMITER //
-DROP PROCEDURE IF EXISTS getAllBlogs //
-CREATE PROCEDURE getAllBlogs(
-    IN userIdIn INT
+DROP PROCEDURE IF EXISTS getBlogsByUser //
+CREATE PROCEDURE getBlogsByUser(
+    IN authorId INT,
+    IN userIdIn INT  -- Optional: Can be NULL to check if the signed-in user liked the blog
 )
-    BEGIN
+BEGIN
     SELECT 
         b.blogId,
         b.title,
@@ -19,12 +20,14 @@ CREATE PROCEDURE getAllBlogs(
                 WHERE l2.blogId = b.blogId AND l2.userId = userIdIn
             ) THEN TRUE 
             ELSE FALSE 
-        END AS userLiked -- Returns TRUE if userIdIn liked the blog, else FALSE
+        END AS userLiked -- TRUE if userIdIn liked the blog, else FALSE
     FROM Blogs b
     JOIN Users u ON b.userId = u.userId
     LEFT JOIN Comments c ON b.blogId = c.blogId
     LEFT JOIN Likes l ON b.blogId = l.blogId
+    WHERE b.userId = authorId  -- Filter by the given author ID
     GROUP BY b.blogId, u.userId
     ORDER BY b.createdAt DESC;
 END //
 DELIMITER ;
+

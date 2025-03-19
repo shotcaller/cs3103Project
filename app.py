@@ -3,7 +3,8 @@ from flask_session import Session
 from flask_restful import Resource, Api
 import settings
 
-from api.authenticator import Login, Register, VerifyEmail, Logout
+from api.authenticator import *
+from api.blogs import *
 
 app = Flask(__name__)
 app.secret_key = settings.SECRET_KEY
@@ -27,10 +28,22 @@ class Root(Resource):
         return "{'title': 'Welcome to Bloggster'}"
     
 api.add_resource(Root, '/')
+#Auth
 api.add_resource(Login, '/login')
 api.add_resource(Logout, '/logout')
 api.add_resource(Register, '/register')
 api.add_resource(VerifyEmail, '/verify-email')
+
+#Blogs
+api.add_resource(Blogs, '/blogs')
+api.add_resource(CommentAttributes, "/blogs/<int:blogId>/comment")
+api.add_resource(BlogAttributes, "/blogs/<int:blogId>")
+api.add_resource(BlogsByUser, "/users/<int:userId>/blogs")
+api.add_resource(Like, "/blogs/<int:blogId>/like")
+api.add_resource(Unlike, "/blogs/<int:blogId>/unlike")
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=settings.APP_DEBUG)

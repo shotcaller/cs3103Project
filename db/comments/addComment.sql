@@ -9,6 +9,7 @@ BEGIN
    INSERT INTO Comments (blogId, userId, content)
    VALUES (blogId, userId, content);
    
+   SELECT * FROM Comments WHERE commentId = LAST_INSERT_ID();
    -- UPDATE Blogs
    -- SET commentCount = commentCount + 1
    -- WHERE BlogId = blogId;

@@ -1,4 +1,4 @@
-from flask import request, make_response, jsonify, session
+from flask import request, make_response, jsonify, session, abort
 
 from flask_restful import Resource
 from db_util import db_access
@@ -14,7 +14,7 @@ class Login(Resource):
         data = request.json
         username, password = data['username'], data['password']
         if not username or not password:
-            return make_response(jsonify({"error": "Missing required fields."}), 400)
+            abort(400, "Missing required fields.")
         
         sqlProcGetUser = 'getUserByUsername'
         sqlProcCheckUserVerified = 'checkUserVerified'
@@ -31,20 +31,20 @@ class Login(Resource):
                 sessionUserId = session.get('userId')
                 if not sessionUserId:
                     session['userId'] = userObj[0]['userId']
-                return make_response(jsonify({"sucess": "Successful Login", "userId": userObj[0]['userId']}),200)
+                return make_response(jsonify({"message": "Successful Login", "userId": userObj[0]['userId']}),200)
             else:
-                return make_response(jsonify({"error": "Incorrect Password."}),400)
+                abort(400, "Incorrect Password.")
         except Exception as e:
-            return make_response(jsonify({"error": str(e)}), 500)
+            abort(500, str(e))
         
 class Logout(Resource):
     def post(self):
         
         if 'userId' in session:
            session.pop('userId',None)
-           return make_response(jsonify({"success": "Successfully logged out."}), 200)
+           return make_response(jsonify({"message": "Successfully logged out."}), 200)
         else:
-           return make_response(jsonify({"error": "Error while logging out. User might not be logged in."}), 500)
+           abort(500, "Error while logging out. User might not be logged in.")
 
 
 class Register(Resource):
@@ -56,7 +56,7 @@ class Register(Resource):
         email = data['email']
 
         if not username or not password or not email:
-            return make_response(jsonify({"error": "Missing required fields."}), 400)
+            abort(400,"Missing required fields.")
 
         #Hashing the password
         passwordHash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt());
@@ -74,9 +74,9 @@ class Register(Resource):
             self.send_verification_email(userId, email, verifcationHash)
 
 
-            return make_response(jsonify({ "success": f"User registered. Please check your email to verify your account." }), 201)
+            return make_response(jsonify({ "message": f"User registered. Please check your email to verify your account." }), 201)
         except Exception as e:
-            return make_response(jsonify({ "error": str(e)}), 400)
+            abort(400,str(e))
         
 
 
@@ -114,11 +114,11 @@ class VerifyEmail(Resource):
                 #user verified. delete user entry from Verification table and insert into VerifiedUsers and create UserProfile record
                 sqlProcResult = db_access(sqlProcVerifyUser, [userId])
 
-                return make_response(jsonify({"success": "User verified and account activated. Please login again."}), 200)
+                return make_response(jsonify({"message": "User verified and account activated. Please login again."}), 200)
             else:
-                return make_response(jsonify({"error": "Unable to verify user. Please register again."}), 500)
+                abort(500, "Unable to verify user. Please register again.")
         except Exception as e:
-            return make_response(jsonify({"error": str(e)}), 400)
+            abort(400, str(e))
 
 
 
