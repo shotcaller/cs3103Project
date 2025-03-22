@@ -1,4 +1,4 @@
-from flask import Flask, make_response, jsonify
+from flask import Flask, make_response, jsonify, render_template
 from flask_session import Session
 from flask_restful import Resource, Api
 from app.blogs import *
@@ -7,7 +7,7 @@ from app.authenticator import *
 from app.users import *
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='', static_folder='bloggster-client/dist', template_folder='bloggster-client/dist')
 app.secret_key = SECRET_KEY
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_COOKIE_NAME'] = 'bloggsterCookie'
@@ -26,7 +26,7 @@ def internal_server_error(error):
 
 class Root(Resource):
     def get(self):
-        return "{'title': 'Welcome to Bloggster'}"
+        return make_response(render_template('index.html'))
     
 api.add_resource(Root, '/')
 #Auth
