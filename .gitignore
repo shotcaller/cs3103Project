@@ -1,6 +1,7 @@
 * .pyc
 __pycache__
 settings.py
+flask_session
 
 
 # Logs
