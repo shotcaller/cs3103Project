@@ -2,12 +2,28 @@ import React, { useState } from 'react'
 import AppBar from '@mui/material/AppBar'
 import { Box, Button, IconButton, Menu, MenuItem, Toolbar, Typography } from '@mui/material'
 import AccountCircle from '@mui/icons-material/AccountCircle';
+import axios from 'axios';
+import { BACKEND_URL } from '../utils/settings';
 
 
 const Menubar = (props) => {
 
-  //Auth variable
-  let auth = props.auth || true;
+  let auth = props.auth;
+
+  const dummyLogin = async () => {
+    let username = 'newtest6'
+    let password = 'password'
+
+    const res = await axios.post(`${BACKEND_URL}/login`, { username, password})
+    if(res.statusText!='OK'){
+      console.log(res.data.message);
+    }
+    else {
+      //LoggedIn 
+      props.setAuthMenu(true)
+    }
+  }
+  
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleMenu = (event) => {
@@ -20,7 +36,7 @@ const Menubar = (props) => {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-        <AppBar>
+        <AppBar position='fixed'>
             <Toolbar>
                 <Typography variant='h6' component='div' sx={{ flexGrow: 1}}>
                     Bloggster
@@ -58,10 +74,11 @@ const Menubar = (props) => {
               </Menu>
             </div>
 
-                  ) : <Button variant='outlined' color='inherit'>Login / Register</Button>
+                  ) : <Button variant='outlined' onClick={dummyLogin} color='inherit'>Login / Register</Button>
                 }
             </Toolbar>
         </AppBar>
+        <Toolbar></Toolbar>
     </Box>
     
   )

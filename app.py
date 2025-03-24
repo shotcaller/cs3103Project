@@ -4,6 +4,7 @@ from flask_restful import Resource, Api
 from app.blogs import *
 from settings.settings import *
 from app.authenticator import *
+from flask_cors import CORS
 from app.users import *
 
 
@@ -12,12 +13,18 @@ app.secret_key = SECRET_KEY
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_COOKIE_NAME'] = 'bloggsterCookie'
 app.config['SESSION_COOKIE_DOMAIN'] = APP_HOST
+app.config['SESSION_COOKIE_SAMESITE'] = None
 Session(app)
 api = Api(app)
 
+CORS(app, supports_credentials=True)
 @app.errorhandler(400)
 def bad_request(error):
     return make_response(jsonify({"status": "Bad request", "message": str(error)}), 400)
+
+@app.errorhandler(404)
+def not_found(e):
+    return make_response(render_template('index.html'))
 
 @app.errorhandler(500)
 def internal_server_error(error):
@@ -28,6 +35,7 @@ class Root(Resource):
     def get(self):
         return make_response(render_template('index.html'))
     
+
 api.add_resource(Root, '/')
 #Auth
 api.add_resource(Login, '/login')
