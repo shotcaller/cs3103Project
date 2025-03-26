@@ -14,7 +14,7 @@ class Blogs(Resource):
             rows = db_access(sqlProc, sqlArgs)
         except Exception as e:
             abort(500, str(e)) 
-        return make_response(jsonify({'blogs': rows}), 200)
+        return make_response(jsonify({'blogs': rows, 'userId': session.get('userId')}), 200)
 
 
     def post(self):
@@ -35,7 +35,7 @@ class Blogs(Resource):
             row = db_access('createBlog', sqlArgs)
         except Exception as e:
             abort(500, str(e))  
-        return make_response(jsonify({"message": resMsg, "blog": row}), 201)
+        return make_response(jsonify({"message": resMsg, "blog": row, 'userId': session.get('userId')}), 201)
 
 
 class CommentAttributes(Resource):
@@ -46,7 +46,7 @@ class CommentAttributes(Resource):
             rows = db_access(sqlProc, sqlArgs)
         except Exception as e:
             abort(500, str(e))  
-        return make_response(jsonify({'comments': rows}), 200)
+        return make_response(jsonify({'comments': rows, 'userId': session.get('userId')}), 200)
 
     def post(self, blogId):
         #Only let signed in user make changes
@@ -64,7 +64,7 @@ class CommentAttributes(Resource):
             row = db_access(sqlProc, sqlArgs)
         except Exception as e:
             abort(500, str(e)) 
-        return make_response(jsonify({"message": "Comment added successfully", "comment": row}), 201)
+        return make_response(jsonify({"message": "Comment added successfully", "comment": row, 'userId': session.get('userId')}), 201)
 
 
 class BlogAttributes(Resource):
@@ -75,7 +75,7 @@ class BlogAttributes(Resource):
             rows = db_access(sqlProc, sqlArgs)
         except Exception as e:
             abort(500, str(e)) 
-        return make_response(jsonify({"blog": rows}), 200)
+        return make_response(jsonify({"blog": rows, 'userId': session.get('userId')}), 200)
 
     def put(self, blogId):
         if 'userId' not in session:
@@ -104,7 +104,7 @@ class BlogAttributes(Resource):
             row = db_access(sqlProc, sqlArgs)
         except Exception as e:
             abort(500, str(e))  
-        return make_response(jsonify({"message": "Blog updated successfully", "blog": row}), 200)
+        return make_response(jsonify({"message": "Blog updated successfully", "blog": row, 'userId': session.get('userId')}), 200)
 
     def delete(self, blogId):
         if 'userId' not in session:
@@ -116,7 +116,7 @@ class BlogAttributes(Resource):
             db_access(sqlProc, sqlArgs)
         except Exception as e:
             abort(500, str(e))  
-        return make_response(jsonify({"message": "Blog deleted successfully."}), 204) 
+        return make_response(jsonify({"message": "Blog deleted successfully.", 'userId': session.get('userId')}), 204) 
 
 # Resource for managing blogs by user
 class BlogsByUser(Resource):
@@ -133,7 +133,7 @@ class BlogsByUser(Resource):
             rows = db_access(sqlProc, sqlArgs)
         except Exception as e:
             abort(500, str(e)) 
-        return make_response(jsonify({"blogs": rows}), 200)
+        return make_response(jsonify({"blogs": rows, 'userId': session.get('userId')}), 200)
 
 # Resource for managing likes
 class Like(Resource):
@@ -147,7 +147,7 @@ class Like(Resource):
             db_access(sqlProc, sqlArgs)
         except Exception as e:
             abort(500, str(e))  
-        return make_response(jsonify({"message": "Blog liked successfully"}), 201)
+        return make_response(jsonify({"message": "Blog liked successfully", 'userId': session.get('userId')}), 201)
 
 
 class Unlike(Resource):
@@ -162,6 +162,6 @@ class Unlike(Resource):
             db_access(sqlProc, sqlArgs)
         except Exception as e:
             abort(500, str(e))  
-        return make_response(jsonify({"message": "Blog unliked successfully"}), 201)
+        return make_response(jsonify({"message": "Blog unliked successfully", 'userId': session.get('userId')}), 201)
 
 

@@ -55,6 +55,7 @@ api.add_resource(BlogAttributes, "/blogs/<int:blogId>")
 api.add_resource(BlogsByUser, "/users/<int:userId>/blogs")
 api.add_resource(Like, "/blogs/<int:blogId>/like")
 api.add_resource(Unlike, "/blogs/<int:blogId>/unlike")
+api.add_resource(LoggedInUser, '/getUserId')
 
 
 

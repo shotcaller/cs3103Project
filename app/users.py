@@ -12,7 +12,7 @@ class Users(Resource):
             rows = db_access(sqlProc, sqlArgs)
         except Exception as e:
             abort(500, str(e))
-        return make_response(jsonify({'users': rows}), 200)
+        return make_response(jsonify({'users': rows, 'userId': session.get('userId')}), 200)
     
 
     #--------This is register endpoint and not needed here. ---
@@ -44,10 +44,27 @@ class Users(Resource):
         else:
             newUsername = None
 
-        if "password" in request.json: 
-            newPasswordHash = bcrypt.hashpw(request.json["password"].encode('utf-8'), bcrypt.gensalt());
+        if "newPassword" in request.json: 
+
+            newPasswordHash = bcrypt.hashpw(request.json["newPassword"].encode('utf-8'), bcrypt.gensalt());
+            #Checking current password of user and matching
+            sqlProc = 'getUserByID'
+            sqlArgs = [userId]
+
+            try:
+                row = db_access(sqlProc, sqlArgs)
+                oldPwdHash = row[0].get('passwordHash')
+                if bcrypt.checkpw(request.json['currentPassword'].encode('utf-8'), oldPwdHash.encode('utf-8')):
+                    pass
+                else:
+                    abort(400, "Incorrect current password")
+
+            except Exception as e:
+                abort(500, "Error while updating details")
         else:
             newPasswordHash = None
+
+        
 
         sqlProc = 'editUser'
         sqlArgs = [userId, newUsername, newPasswordHash]
@@ -56,7 +73,7 @@ class Users(Resource):
             row = db_access(sqlProc, sqlArgs)
         except Exception as e:
             abort(500, str(e))
-        return make_response(jsonify({"message": "User successfully updated", "user": row}), 201)
+        return make_response(jsonify({"message": "User successfully updated", "user": row, 'userId': session.get('userId')}), 201)
     
 
 class UsersById(Resource):
@@ -65,9 +82,10 @@ class UsersById(Resource):
         sqlArgs = [userId]
         try:
             rows = db_access(sqlProc, sqlArgs)
+            rows[0].pop('passwordHash', None)
         except Exception as e:
             abort(500, str(e))
-        return make_response(jsonify({"users": rows}), 200)
+        return make_response(jsonify({"users": rows, 'userId': session.get('userId')}), 200)
 
 class UsersByUsername(Resource):
     def get(self, username):
@@ -77,6 +95,10 @@ class UsersByUsername(Resource):
             rows = db_access(sqlProc, sqlArgs)
         except Exception as e:
             abort(500, str(e))
-        return make_response(jsonify({"users": rows}), 200)
+        return make_response(jsonify({"users": rows, 'userId': session.get('userId')}), 200)
+    
+class LoggedInUser(Resource):
+    def get(self):
+        return make_response(jsonify({'userId': session.get('userId')}))
 
 
