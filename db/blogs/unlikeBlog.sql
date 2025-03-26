@@ -6,7 +6,7 @@ BEGIN
       SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'This Blog does not exist';
    END IF;
 
-   IF NOT EXISTS (SELECT 1 FROM Users WHERE Users.userId = blogIdIn) THEN
+   IF NOT EXISTS (SELECT 1 FROM Users WHERE Users.userId = userIdIn) THEN
       SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'This User does not exist';
    END IF;
 

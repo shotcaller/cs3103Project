@@ -10,7 +10,8 @@ BEGIN
 
    SELECT c.commentId, c.blogId, c.userId, u.userName, c.content, c.createdAt
    FROM Comments c JOIN Users u ON c.userId = u.userId
-   WHERE c.blogId = blogId;
+   WHERE c.blogId = blogId
+   ORDER BY c.createdAt DESC;
 
 END //
 
