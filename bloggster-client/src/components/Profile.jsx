@@ -6,6 +6,7 @@ import axios from 'axios'
 import { BACKEND_URL } from '../utils/settings'
 import { Blog } from './BlogList'
 import { AuthContext } from '../utils/AuthContext'
+import { LoaderContext } from '../utils/LoaderContext'
 
 export const Profile = () => {
     const params = useParams()
@@ -19,14 +20,16 @@ export const Profile = () => {
     const [newPassword, setNewPassword] = useState('')
     const [userBlogs, setUserBlogs] = useState([])
 
+    const { setLoader } = useContext(LoaderContext)
+
 
     async function getUserDetails(userId) {
-        const res = await axios.get(`${BACKEND_URL}/users/${userId}`)
-        if(res.status!=200){
-            //Error 
-        }
-        else {
+        try {
+            const res = await axios.get(`${BACKEND_URL}/users/${userId}`)
             setUserData(res.data.users[0])
+        }catch (e) {
+            //Error
+            console.log(e)
         }
     }
 
@@ -61,10 +64,9 @@ export const Profile = () => {
                 delete updateRequest[key]
         }) 
 
-        const res = await axios.put(`${BACKEND_URL}/users`, updateRequest)
-        if(res.status!=201){
-            //error
-        } else {
+        setLoader(true)
+        try {
+            const res = await axios.put(`${BACKEND_URL}/users`, updateRequest)
             //Profile successful updated
             setNewUserName('')
             setCurrentPassword('')
@@ -72,6 +74,12 @@ export const Profile = () => {
             getUserDetails(params.id)
             getUserBlogs(params.id)
 
+        } catch (e) {
+            //Show error
+            console.log(e)
+
+        } finally {
+            setLoader(false)
         }
 
     }
