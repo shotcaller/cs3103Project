@@ -9,10 +9,12 @@ import axios from 'axios';
 import { BACKEND_URL } from '../utils/settings';
 import { AuthContext } from '../utils/AuthContext';
 import { LikeButton } from './LikeButton';
+import { MessageBoxContext } from '../utils/MessageBarContent';
 
 export const BlogDetail = () => {
     const state = useLocation()
     const { setUserId, setAuth } = useContext(AuthContext)
+    const { setMessageBox } = useContext(MessageBoxContext)
     const navigate = useNavigate()
     console.log(state.state)
     if(!state.state){
@@ -23,9 +25,14 @@ export const BlogDetail = () => {
     const [newComment, setNewComment] = useState('')
 
     async function fetchComments() {
-        const res = await axios.get(`${BACKEND_URL}/blogs/${blogData.blogId}/comment`)
-        if(res.statusText=='OK'){
+        try{
+            const res = await axios.get(`${BACKEND_URL}/blogs/${blogData.blogId}/comment`)
             setComments(res.data.comments)
+
+        } catch(e){
+            console.log(e)
+            setMessageBox({open: true, severity: 'error', message: 'Error while fetching comments.'})
+
         }
     }
     useEffect(() => {
@@ -34,16 +41,19 @@ export const BlogDetail = () => {
 
     const postComment = async () => {
         if(newComment.length!=0){
-            const res = await axios.post(`${BACKEND_URL}/blogs/${blogData.blogId}/comment`, {content: newComment})
-            if(res.status==200 || res.status==201){
-                //Success comment msg
+            try{
+                const res = await axios.post(`${BACKEND_URL}/blogs/${blogData.blogId}/comment`, {content: newComment})
+                setMessageBox({ open: true, severity: 'success', message: 'Comment added successfully.'})
                 fetchComments()
                 setComments('')
-            } else {
-                //Error for not able to add comment
+            } catch(e) {
+                console.log(e)
+                let message = e?.response?.data?.message
+                setMessageBox({ open: true, severity: 'error', message: `${message? message:'Error while posting comment'}`})
             }
         } else {
             //Error for empty comment
+            setMessageBox({ open: true, severity: 'warning', message: 'Comment cannot be empty.'})
         }
     }
   return (

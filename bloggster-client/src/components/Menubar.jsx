@@ -6,6 +6,7 @@ import axios from 'axios';
 import { BACKEND_URL } from '../utils/settings';
 import { AuthContext } from '../utils/AuthContext';
 import { useLocation, useNavigate } from 'react-router';
+import { MessageBoxContext } from '../utils/MessageBarContent';
 
 
 const Menubar = (props) => {
@@ -13,6 +14,7 @@ const Menubar = (props) => {
   const { auth, userId, setAuth, setUserId } = useContext(AuthContext)
   const navigate = useNavigate()
   const location = useLocation()
+  const { setMessageBox } = useContext(MessageBoxContext)
 
 
   useEffect(() => {
@@ -63,17 +65,18 @@ const Menubar = (props) => {
 
   const handleLogout = async () => {
     handleClose()
+    try{
     const res = await axios.post(`${BACKEND_URL}/logout`)
-    if(res.statusText!='OK'){
-      //Unable to logout
+    setMessageBox({ open: true, severity: 'success', message: 'Logged out successfully.'})
+    setAuth(false)
+    setUserId(0)
+    navigate('/signin')
+       
+    } catch (e) {
+      let msg = e?.response?.data?.message
+      setMessageBox({ open:  true, severity: 'error', message: msg?msg:'An error occured while logging out.'})
     }
-    else {
-      //Logged out
-      setAuth(false)
-      setUserId(0)
-      navigate('/')
-
-    }
+    
   }
 
   return (

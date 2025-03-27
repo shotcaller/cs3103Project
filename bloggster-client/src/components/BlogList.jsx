@@ -9,18 +9,24 @@ import { Link } from 'react-router';
 import { AuthContext } from '../utils/AuthContext';
 import { LikeButton } from './LikeButton';
 import { LoaderContext } from '../utils/LoaderContext';
+import { MessageBoxContext } from '../utils/MessageBarContent';
 
 const BlogList = () => {
     const [blogs, setBlogs] = useState([]);
     const { auth } = useContext(AuthContext)
     const { setLoader } = useContext(LoaderContext)
+    const { setMessageBox } = useContext(MessageBoxContext)
     useEffect (() => {
         setLoader(true)
         axios.get(`${BACKEND_URL}/blogs`)
            .then(response => {
             setBlogs(response.data.blogs)
            })
-           .catch(error => console.error("Error getting blogs:", error)).finally(() => setLoader(false));
+           .catch(error => {
+            console.error("Error getting blogs:", error)
+            let msg = error?.response?.data?.message
+            setMessageBox({ open: true, severity: 'error', message: msg?msg:'Error while fetching blogs.'})
+        }).finally(() => setLoader(false));
     }, [auth]);
 
     return (
@@ -52,10 +58,12 @@ export const Blog = ({ blogData, editFlag }) => {
                 <Typography variant='h5' component='div'>
                    #{blogData.blogId} {blogData.title}
                 </Typography>
+                
                 <Typography gutterBottom variant='body2' color='text.secondary'>
-                    ~ by {blogData.authorUsername}
+                    ~ by <Link to={`/profile/${blogData.authorId}`} style={{ color: 'inherit'}}>
+                    {blogData.authorUsername}</Link>
                 </Typography>
-
+                
                 <Typography variant='body2' >
                     {blogData?.content}
                 </Typography>

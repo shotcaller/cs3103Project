@@ -5,12 +5,14 @@ import { BACKEND_URL } from '../utils/settings'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Link, useNavigate, useParams } from 'react-router'
 import { LoaderContext } from '../utils/LoaderContext';
+import { MessageBoxContext } from '../utils/MessageBarContent';
 
 export const CreateBlog = () => {
     const { bid } = useParams()
     const [titleField, setTitleField] = useState('')
     const [contentField, setContentField] = useState('')
     const { setLoader } = useContext(LoaderContext)
+    const { setMessageBox } = useContext(MessageBoxContext)
 
     async function getBlog(blogId) {
         setLoader(true)
@@ -21,6 +23,9 @@ export const CreateBlog = () => {
 
         } catch (e) {
             console.log(e)
+            let msg = e?.response?.data?.message
+            setMessageBox({ open: true, severity: 'error', message: msg?msg:'Error while fetching blog details.' })
+
 
         } finally {
             setLoader(false)
@@ -55,9 +60,12 @@ export const CreateBlog = () => {
         :
         await axios.post(`${BACKEND_URL}/blogs`, {title: titleField, content: contentField }, {withCredentials: true})
         //Success MEssage
+        setMessageBox({ open: true, severity: 'success', message: `Blog ${bid?'updated':'created'} successfully.` })
         navigate('/')
         } catch (e) {
             console.log(e)
+            let msg = e?.response?.data?.message
+            setMessageBox({ open: true, severity: 'error', message: msg?msg:'An error occurred while creating/editing the blog.'})
 
         } finally {
             setLoader(false)

@@ -7,6 +7,7 @@ import { BACKEND_URL } from '../utils/settings'
 import { Blog } from './BlogList'
 import { AuthContext } from '../utils/AuthContext'
 import { LoaderContext } from '../utils/LoaderContext'
+import { MessageBoxContext } from '../utils/MessageBarContent'
 
 export const Profile = () => {
     const params = useParams()
@@ -21,6 +22,7 @@ export const Profile = () => {
     const [userBlogs, setUserBlogs] = useState([])
 
     const { setLoader } = useContext(LoaderContext)
+    const { setMessageBox } = useContext(MessageBoxContext)
 
 
     async function getUserDetails(userId) {
@@ -29,19 +31,23 @@ export const Profile = () => {
             setUserData(res.data.users[0])
         }catch (e) {
             //Error
+            let msg = e?.response?.data?.message
+            setMessageBox({ open: true, severity: 'error', message: msg?msg:'Error while fetching user details.' })
             console.log(e)
         }
     }
 
     async function getUserBlogs(userId) {
-        const res = await axios.get(`${BACKEND_URL}/users/${userId}/blogs`)
-        if(res.status!=200){
-            //Error
-        }
-        else {
+        try{
+            const res = await axios.get(`${BACKEND_URL}/users/${userId}/blogs`)
             setUserBlogs(res.data.blogs)
-        }
 
+
+        } catch(e) {
+            let msg = e?.response?.data?.message
+            setMessageBox({ open: true, severity: 'error', message: msg?msg:'Error while fetching blog details.' })
+            console.log(e)
+        }
     }
     useEffect(() => {
         getUserDetails(params.id)
@@ -68,6 +74,7 @@ export const Profile = () => {
         try {
             const res = await axios.put(`${BACKEND_URL}/users`, updateRequest)
             //Profile successful updated
+            setMessageBox({ open: true, severity: 'success', message: 'Profile updated successfully.'})
             setNewUserName('')
             setCurrentPassword('')
             setNewPassword('')
@@ -77,6 +84,9 @@ export const Profile = () => {
         } catch (e) {
             //Show error
             console.log(e)
+            let msg = e?.response?.data?.message
+            setMessageBox({ open: true, severity: 'error', message: msg?msg:'Error while updated user profile details.' })
+
 
         } finally {
             setLoader(false)
@@ -125,7 +135,7 @@ export const Profile = () => {
         <Typography sx={{ mb: 2, mt: 2}} variant='h5'>Blogs: </Typography>
 
         {userBlogs.length>0 ? userBlogs.map((blog) => (
-            <Blog blogData={blog} editFlag={true} />
+            <Blog blogData={blog} editFlag={userId == params.id} />
         ))
         : 
         <Typography variant='caption'>No blogs by this user!</Typography>}

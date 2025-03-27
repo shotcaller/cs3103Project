@@ -14,11 +14,14 @@ import { Profile } from './components/Profile'
 import { LoginRegister } from './components/LoginRegister'
 import { LoaderContext } from './utils/LoaderContext'
 import { Loader } from './components/Loader'
+import { MessageBoxContext } from './utils/MessageBarContent'
+import { MessageBox } from './components/MessageBox'
 
 function App() {
   const [auth, setAuth] = useState(false)
   const [userId, setUserId] = useState(0)
   const [loader, setLoader] = useState(false)
+  const [messageBox, setMessageBox] = useState({ open: false, severity: '', message: ''})
   axios.defaults.withCredentials = true
   const setAuthMenu = (authValue) => {
     setAuth(authValue);
@@ -27,6 +30,7 @@ function App() {
     <>
     <AuthContext.Provider value={{ auth, setAuth, userId, setUserId}}>
       <LoaderContext.Provider value={{ loader, setLoader}}>
+        <MessageBoxContext.Provider value={{ setMessageBox }}>
     <BrowserRouter>
     <Menubar />
       <Box sx={{ flexGrow: 1}}>
@@ -52,6 +56,9 @@ function App() {
       
     </BrowserRouter>
     <Loader toggleLoader={loader}  />
+    <MessageBox open={messageBox.open} severity={messageBox.severity} message={messageBox.message} 
+    handleClose={()=>setMessageBox({open: false, severity: '', message: ''})} />
+    </MessageBoxContext.Provider>
     </LoaderContext.Provider>
     </AuthContext.Provider>
       

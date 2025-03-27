@@ -6,6 +6,7 @@ import { BACKEND_URL } from '../utils/settings'
 import { AuthContext } from '../utils/AuthContext'
 import { useNavigate } from 'react-router'
 import { LoaderContext } from '../utils/LoaderContext'
+import { MessageBoxContext } from '../utils/MessageBarContent'
 export const LoginRegister = () => {
     const [loginTab, setLoginTab] = useState(1)
 
@@ -40,17 +41,21 @@ const Login = () => {
     const { setAuth, setUserId } = useContext(AuthContext)
     const navigate = useNavigate()
     const { setLoader } = useContext(LoaderContext)
+    const { setMessageBox } = useContext(MessageBoxContext)
 
     const handleSubmit = async (e) => {
         e.preventDefault()
         setLoader(true)
         try{
             const res = await axios.post(`${BACKEND_URL}/login`, {username: userName, password })
+            setMessageBox({ open: true, severity: 'success', message: 'Logged in successfully!' })
             setAuth(true)
             setUserId(res.data.userId)
             navigate('/')
         } catch (e) {
             console.log(e)
+            let msg = e?.response?.data?.message
+            setMessageBox({ open: true, severity: 'error', message: msg?msg:'An error occured while logging in.' })
         } finally {
             setLoader(false)
         }
@@ -70,18 +75,21 @@ const Register = () => {
     const [password, setPassword] = useState('') 
     const [email, setEmail] = useState('')
     const { setLoader } = useContext(LoaderContext)
+    const { setMessageBox } = useContext(MessageBoxContext)
 
     const handleSubmit = async (e) => {
         e.preventDefault()
         setLoader(true)
         try{
             const res = await axios.post(`${BACKEND_URL}/register`, {username: userName, password, email})
-            alert(res.data.message)
+            setMessageBox({ open: true, severity: 'success', message: res.data.message })
             setUserName('')
             setPassword('')
             setEmail('')
 
         } catch (e) {
+            let msg = e?.response?.data?.message
+            setMessageBox({ open: true, severity: 'error', message: msg?msg:'An error occured while registering new user.' })
 
         } finally {
             setLoader(false)
