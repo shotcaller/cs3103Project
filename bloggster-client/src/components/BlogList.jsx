@@ -8,16 +8,19 @@ import CreateIcon from '@mui/icons-material/Create';
 import { Link } from 'react-router';
 import { AuthContext } from '../utils/AuthContext';
 import { LikeButton } from './LikeButton';
+import { LoaderContext } from '../utils/LoaderContext';
 
 const BlogList = () => {
     const [blogs, setBlogs] = useState([]);
     const { auth } = useContext(AuthContext)
+    const { setLoader } = useContext(LoaderContext)
     useEffect (() => {
+        setLoader(true)
         axios.get(`${BACKEND_URL}/blogs`)
            .then(response => {
             setBlogs(response.data.blogs)
            })
-           .catch(error => console.error("Error getting blogs:", error));
+           .catch(error => console.error("Error getting blogs:", error)).finally(() => setLoader(false));
     }, [auth]);
 
     return (
@@ -26,7 +29,7 @@ const BlogList = () => {
             <Typography variant='h4'component='span' sx={{ mb: 2, mt: 2}}>
                 Blogs    
             </Typography>
-            <Button variant='contained' startIcon={<CreateIcon />} 
+            <Button variant='contained' startIcon={<CreateIcon />} disabled={!auth} 
             style={{ marginLeft: 'auto',  height: 'min-content', justifyItems: 'center'}}>
                 <Link to="/create-blog" style={{ textDecoration: 'none', color: 'inherit'}}>
                     Create

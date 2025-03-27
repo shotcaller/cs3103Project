@@ -1,22 +1,29 @@
 import { Box, Button, IconButton, TextField, Typography } from '@mui/material'
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { BACKEND_URL } from '../utils/settings'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Link, useNavigate, useParams } from 'react-router'
+import { LoaderContext } from '../utils/LoaderContext';
 
 export const CreateBlog = () => {
     const { bid } = useParams()
     const [titleField, setTitleField] = useState('')
     const [contentField, setContentField] = useState('')
+    const { setLoader } = useContext(LoaderContext)
 
     async function getBlog(blogId) {
-        const res = await axios.get(`${BACKEND_URL}/blogs/${blogId}`)
-        if(res.status!=200){
-            //Error
-        } else {
+        setLoader(true)
+        try{
+            const res = await axios.get(`${BACKEND_URL}/blogs/${blogId}`)
             setTitleField(res.data.blog[0].title)
             setContentField(res.data.blog[0].content)
+
+        } catch (e) {
+            console.log(e)
+
+        } finally {
+            setLoader(false)
         }
     }
 
@@ -40,17 +47,22 @@ export const CreateBlog = () => {
             //error 
             return;
         }
-        const res = bid?
-        await axios.put(`${BACKEND_URL}/blogs/${bid}`, {title: titleField, content: contentField }, {withCredentials: true})
+        setLoader(true)
+        
+        try {
+            const res = bid?
+            await axios.put(`${BACKEND_URL}/blogs/${bid}`, {title: titleField, content: contentField }, {withCredentials: true})
         :
         await axios.post(`${BACKEND_URL}/blogs`, {title: titleField, content: contentField }, {withCredentials: true})
-        if(res.status==200 || res.status==201){
-            //Success created!
-            navigate('/')
-        } else {
-            //Show error
-            
+        //Success MEssage
+        navigate('/')
+        } catch (e) {
+            console.log(e)
+
+        } finally {
+            setLoader(false)
         }
+        
     }
 
   return (

@@ -5,6 +5,7 @@ import axios from 'axios'
 import { BACKEND_URL } from '../utils/settings'
 import { AuthContext } from '../utils/AuthContext'
 import { useNavigate } from 'react-router'
+import { LoaderContext } from '../utils/LoaderContext'
 export const LoginRegister = () => {
     const [loginTab, setLoginTab] = useState(1)
 
@@ -38,22 +39,21 @@ const Login = () => {
     const [password, setPassword] = useState('') 
     const { setAuth, setUserId } = useContext(AuthContext)
     const navigate = useNavigate()
+    const { setLoader } = useContext(LoaderContext)
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        
+        setLoader(true)
+        try{
             const res = await axios.post(`${BACKEND_URL}/login`, {username: userName, password })
-            if(res.status!=200){
-                //Error for login
-            }
-            else {
-                //Message for successful login
-                setAuth(true)
-                setUserId(res.data.userId)
-                navigate('/')
-                
-            }
-        
+            setAuth(true)
+            setUserId(res.data.userId)
+            navigate('/')
+        } catch (e) {
+            console.log(e)
+        } finally {
+            setLoader(false)
+        }
     }
 
     return (
@@ -69,19 +69,22 @@ const Register = () => {
     const [userName, setUserName] = useState('')
     const [password, setPassword] = useState('') 
     const [email, setEmail] = useState('')
+    const { setLoader } = useContext(LoaderContext)
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-
-        const res = await axios.post(`${BACKEND_URL}/register`, {username: userName, password, email})
-        if(res.status!=201){
-            //Error show
-        }
-        else {
+        setLoader(true)
+        try{
+            const res = await axios.post(`${BACKEND_URL}/register`, {username: userName, password, email})
             alert(res.data.message)
             setUserName('')
             setPassword('')
             setEmail('')
+
+        } catch (e) {
+
+        } finally {
+            setLoader(false)
         }
 
     }

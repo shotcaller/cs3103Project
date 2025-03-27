@@ -12,10 +12,13 @@ import axios from 'axios'
 import { AuthContext } from './utils/AuthContext'
 import { Profile } from './components/Profile'
 import { LoginRegister } from './components/LoginRegister'
+import { LoaderContext } from './utils/LoaderContext'
+import { Loader } from './components/Loader'
 
 function App() {
   const [auth, setAuth] = useState(false)
   const [userId, setUserId] = useState(0)
+  const [loader, setLoader] = useState(false)
   axios.defaults.withCredentials = true
   const setAuthMenu = (authValue) => {
     setAuth(authValue);
@@ -23,6 +26,7 @@ function App() {
   return (
     <>
     <AuthContext.Provider value={{ auth, setAuth, userId, setUserId}}>
+      <LoaderContext.Provider value={{ loader, setLoader}}>
     <BrowserRouter>
     <Menubar />
       <Box sx={{ flexGrow: 1}}>
@@ -47,6 +51,8 @@ function App() {
       </Box>
       
     </BrowserRouter>
+    <Loader toggleLoader={loader}  />
+    </LoaderContext.Provider>
     </AuthContext.Provider>
       
     </>
